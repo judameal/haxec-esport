@@ -1,18 +1,30 @@
+import { connectDB } from "./lib/db";
+import { User } from "./lib/models";
+import { createToken } from "./lib/auth";
+
 export default async function handler(req, res) {
-  try {
-    if (req.method !== "POST") {
-      return res.status(200).json({ message: "login endpoint" });
-    }
+  await connectDB();
 
-    const { user, password } = req.body;
+  if (req.method !== "POST")
+    return res.status(405).json({ error: "Método no permitido" });
 
-    if (user === "Judameal" && password === "1234") {
-      return res.status(200).json({ success: true });
-    }
+  const { username, password } = req.body;
 
-    return res.status(401).json({ success: false });
+  const user = await User.findOne({ username });
+  if (!user) return res.status(400).json({ error: "Usuario no existe" });
 
-  } catch (error) {
-    return res.status(500).json({ error: "Error del servidor" });
-  }
+  if (user.password !== password)
+    return res.status(400).json({ error: "Contraseña incorrecta" });
+
+  if (user.banned)
+    return res.status(403).json({ error: "Usuario baneado" });
+
+  const token = createToken(user);
+
+  return res.json({
+    token,
+    username: user.username,
+    role: user.role,
+    id: user._id
+  });
 }
