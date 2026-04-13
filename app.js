@@ -6,11 +6,22 @@ let currentUser = null;
 const api = async (method, path, body) => {
   const res = await fetch(API + path, {
     method,
-    headers: { 'Content-Type': 'application/json', 'Authorization': token },
+    headers: { 
+      'Content-Type': 'application/json', 
+      'Authorization': token 
+    },
     body: body ? JSON.stringify(body) : undefined
   });
-  const data = await res.json();
+
+  let data;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error('El servidor no respondió correctamente');
+  }
+
   if (!res.ok) throw new Error(data.error || 'Error del servidor');
+
   return data;
 };
 
