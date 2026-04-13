@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HaxEC eSport</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="auth-screen">
+  <div class="auth-bg"></div>
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-hex">⬡</div>
+      <h1>HaxEC <span>eSport</span></h1>
+      <p>Liga de Fútbol Profesional</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="tab-btn active" onclick="switchTab('login')">Iniciar Sesión</button>
+      <button class="tab-btn" onclick="switchTab('register')">Registrarse</button>
+    </div>
+    <div id="login-form" class="auth-form">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="login-user" placeholder="Ingresa tu usuario" />
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="Ingresa tu contraseña" />
+      </div>
+      <button class="btn-primary full" onclick="login()">ENTRAR</button>
+      <p id="login-error" class="error-msg"></p>
+    </div>
+    <div id="register-form" class="auth-form hidden">
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="reg-user" placeholder="Elige un usuario" />
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="reg-pass" placeholder="Elige una contraseña" />
+      </div>
+      <button class="btn-primary full" onclick="register()">REGISTRARSE</button>
+      <p id="reg-error" class="error-msg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="app hidden">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-hex-sm">⬡</div>
+      <span>HaxEC</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" onclick="navigate('home')" data-page="home">
+        <span class="nav-icon">🏠</span><span class="nav-text">Inicio</span>
+      </a>
+      <a class="nav-item" onclick="navigate('teams')" data-page="teams">
+        <span class="nav-icon">🏟️</span><span class="nav-text">Equipos</span>
+      </a>
+      <a class="nav-item" onclick="navigate('players')" data-page="players">
+        <span class="nav-icon">👤</span><span class="nav-text">Jugadores</span>
+      </a>
+      <a class="nav-item" onclick="navigate('league')" data-page="league">
+        <span class="nav-icon">📅</span><span class="nav-text">Liga</span>
+      </a>
+      <a class="nav-item" onclick="navigate('matches')" data-page="matches">
+        <span class="nav-icon">🎮</span><span class="nav-text">Partidos</span>
+      </a>
+      <a class="nav-item" onclick="navigate('stats')" data-page="stats">
+        <span class="nav-icon">📊</span><span class="nav-text">Estadísticas</span>
+      </a>
+      <a class="nav-item" onclick="navigate('reports')" data-page="reports">
+        <span class="nav-icon">📁</span><span class="nav-text">Informes</span>
+      </a>
+      <a class="nav-item admin-only hidden" onclick="navigate('admin')" data-page="admin">
+        <span class="nav-icon">🛠️</span><span class="nav-text">Admin</span>
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">J</div>
+        <div>
+          <div id="sidebar-username" class="username"></div>
+          <div id="sidebar-role" class="user-role"></div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">⏻</button>
+    </div>
+  </aside>
+
+  <!-- Mobile header -->
+  <div class="mobile-header">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <span class="mobile-title">HaxEC eSport</span>
+    <button class="btn-logout-sm" onclick="logout()">⏻</button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content" id="main-content">
+
+    <!-- HOME -->
+    <section id="page-home" class="page active">
+      <div class="page-header">
+        <h2>Dashboard</h2>
+        <p>Bienvenido a HaxEC eSport</p>
+      </div>
+      <div class="stats-grid" id="home-stats"></div>
+      <div class="dashboard-grid">
+        <div class="card">
+          <h3>🏆 Top Goleadores</h3>
+          <div id="home-scorers"></div>
+        </div>
+        <div class="card">
+          <h3>📅 Próximos Partidos</h3>
+          <div id="home-fixtures"></div>
+        </div>
+        <div class="card full-width">
+          <h3>📊 Tabla de Posiciones</h3>
+          <div id="home-standings"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAMS -->
+    <section id="page-teams" class="page hidden">
+      <div class="page-header">
+        <h2>Equipos</h2>
+        <div class="header-actions">
+          <button class="btn-primary admin-only hidden" onclick="openTeamModal()">+ Añadir Equipo</button>
+        </div>
+      </div>
+      <div class="teams-grid" id="teams-grid"></div>
+      <!-- Team Detail -->
+      <div id="team-detail" class="hidden">
+        <button class="btn-back" onclick="closeTeamDetail()">← Volver</button>
+        <div id="team-detail-content"></div>
+      </div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="page-players" class="page hidden">
+      <div class="page-header">
+        <h2>Jugadores</h2>
+        <div class="header-actions">
+          <div class="search-box">
+            <input type="text" id="player-search" placeholder="🔎 Buscar por nombre o equipo..." oninput="filterPlayers()" />
+          </div>
+          <button class="btn-primary admin-only hidden" onclick="openPlayerModal()">+ Añadir Jugador</button>
+        </div>
+      </div>
+      <div id="players-list"></div>
+      <!-- Player Detail -->
+      <div id="player-detail" class="hidden">
+        <button class="btn-back" onclick="closePlayerDetail()">← Volver</button>
+        <div id="player-detail-content"></div>
+      </div>
+    </section>
+
+    <!-- LEAGUE -->
+    <section id="page-league" class="page hidden">
+      <div class="page-header">
+        <h2>Liga</h2>
+        <div class="header-actions">
+          <button class="btn-primary admin-only hidden" id="start-league-btn" onclick="startLeague()">⚡ Iniciar Liga</button>
+          <button class="btn-danger admin-only hidden" id="reset-league-btn" onclick="resetLeague()" style="display:none">🔄 Reiniciar Liga</button>
+        </div>
+      </div>
+      <div class="league-tabs">
+        <button class="ltab active" onclick="switchLeagueTab('standings')">Tabla</button>
+        <button class="ltab" onclick="switchLeagueTab('schedule')">Calendario</button>
+      </div>
+      <div id="league-standings-tab">
+        <div id="standings-table"></div>
+      </div>
+      <div id="league-schedule-tab" class="hidden">
+        <div id="schedule-grid"></div>
+      </div>
+    </section>
+
+    <!-- MATCHES -->
+    <section id="page-matches" class="page hidden">
+      <div class="page-header">
+        <h2>Partidos</h2>
+        <div class="header-actions">
+          <button class="btn-primary admin-only hidden" onclick="openMatchModal()">🎮 Jugar Partido</button>
+        </div>
+      </div>
+      <div id="matches-list"></div>
+    </section>
+
+    <!-- STATS -->
+    <section id="page-stats" class="page hidden">
+      <div class="page-header"><h2>Estadísticas</h2></div>
+      <div class="stats-tabs">
+        <button class="stab active" onclick="switchStatTab('players')">Jugadores</button>
+        <button class="stab" onclick="switchStatTab('teams')">Equipos</button>
+      </div>
+      <div id="stats-players-tab">
+        <div class="stats-categories" id="player-stats-content"></div>
+      </div>
+      <div id="stats-teams-tab" class="hidden">
+        <div class="stats-categories" id="team-stats-content"></div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section id="page-reports" class="page hidden">
+      <div class="page-header"><h2>Informes</h2></div>
+      <div id="reports-list"></div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="page-admin" class="page hidden">
+      <div class="page-header"><h2>Panel de Administración</h2></div>
+      <div id="admin-users-list"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODALS -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeAllModals()"></div>
+
+<!-- Team Modal -->
+<div id="team-modal" class="modal hidden">
+  <div class="modal-header">
+    <h3 id="team-modal-title">Añadir Equipo</h3>
+    <button onclick="closeAllModals()">✕</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="team-edit-id" />
+    <div class="form-group"><label>Nombre del Club *</label><input type="text" id="team-name" placeholder="Ej: FC Barcelona" /></div>
+    <div class="form-group"><label>Logo (URL de imagen)</label><input type="text" id="team-logo" placeholder="https://..." /></div>
+    <div class="form-group"><label>Director Técnico *</label><input type="text" id="team-coach" placeholder="Nombre del DT" /></div>
+    <p id="team-error" class="error-msg"></p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" onclick="closeAllModals()">Cancelar</button>
+    <button class="btn-primary" onclick="saveTeam()">Guardar</button>
+  </div>
+</div>
+
+<!-- Player Modal -->
+<div id="player-modal" class="modal hidden">
+  <div class="modal-header">
+    <h3 id="player-modal-title">Añadir Jugador</h3>
+    <button onclick="closeAllModals()">✕</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="player-edit-id" />
+    <div class="form-group"><label>Nombre *</label><input type="text" id="player-name" placeholder="Nombre completo" /></div>
+    <div class="form-group"><label>Dorsal *</label><input type="number" id="player-dorsal" placeholder="Número" min="1" max="99" /></div>
+    <div class="form-group"><label>Equipo *</label><select id="player-team"></select></div>
+    <div class="form-group"><label>Posición *</label>
+      <select id="player-position">
+        <option value="">Seleccionar...</option>
+        <option>Portero</option>
+        <option>Defensa</option>
+        <option>Mediocampista</option>
+        <option>Delantero</option>
+      </select>
+    </div>
+    <p id="player-error" class="error-msg"></p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" onclick="closeAllModals()">Cancelar</button>
+    <button class="btn-primary" onclick="savePlayer()">Guardar</button>
+  </div>
+</div>
+
+<!-- Match Modal -->
+<div id="match-modal" class="modal match-modal hidden">
+  <div class="modal-header">
+    <h3>🎮 Registrar Partido</h3>
+    <button onclick="closeAllModals()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div class="match-form-grid">
+      <div class="form-group"><label>Jornada *</label><select id="match-jornada"></select></div>
+      <div class="form-group"><label>Equipo Local *</label><select id="match-home" onchange="updateMatchPlayers()"></select></div>
+      <div class="form-group"><label>Equipo Visitante *</label><select id="match-away" onchange="updateMatchPlayers()"></select></div>
+      <div class="form-group"><label>Goles Local *</label><input type="number" id="match-home-score" min="0" value="0" /></div>
+      <div class="form-group"><label>Goles Visitante *</label><input type="number" id="match-away-score" min="0" value="0" /></div>
+    </div>
+
+    <div class="form-section">
+      <h4>⚽ Goleadores</h4>
+      <div id="scorers-container"></div>
+      <button class="btn-add" onclick="addScorer()">+ Añadir goleador</button>
+    </div>
+
+    <div class="form-section">
+      <h4>🅰️ Asistencias</h4>
+      <div id="assists-container"></div>
+      <button class="btn-add" onclick="addAssist()">+ Añadir asistencia</button>
+    </div>
+
+    <div class="form-section">
+      <h4>🟨 Tarjetas Amarillas</h4>
+      <div id="yellow-cards-container"></div>
+      <button class="btn-add" onclick="addYellowCard()">+ Añadir tarjeta</button>
+    </div>
+
+    <div class="form-section">
+      <h4>🟥 Tarjetas Rojas</h4>
+      <div id="red-cards-container"></div>
+      <button class="btn-add" onclick="addRedCard()">+ Añadir tarjeta</button>
+    </div>
+
+    <div class="match-form-grid">
+      <div class="form-group"><label>🚌 Buses Local</label><input type="number" id="match-home-buses" min="0" value="0" /></div>
+      <div class="form-group"><label>🚌 Buses Visitante</label><input type="number" id="match-away-buses" min="0" value="0" /></div>
+    </div>
+
+    <div class="form-group"><label>⭐ MVP</label><select id="match-mvp"><option value="">Sin MVP</option></select></div>
+    <div class="form-group"><label>📝 Notas</label><textarea id="match-notes" rows="3" placeholder="Notas del partido..."></textarea></div>
+    <div class="form-group"><label>🎥 Link grabación</label><input type="text" id="match-recording" placeholder="URL del video..." /></div>
+
+    <p id="match-error" class="error-msg"></p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn-secondary" onclick="closeAllModals()">Cancelar</button>
+    <button class="btn-primary" onclick="saveMatch()">Guardar Partido</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- FOOTER -->
+<footer class="app-footer">© Todos los derechos reservados - Hecho por Judameal</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
